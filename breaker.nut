@@ -18,13 +18,13 @@ quit <- false;
 Ball <- class extends Actor
 {
 	hspeed = 0;
-	vspeed = -1;
+	vspeed = 0;
 
 	constructor(_x, _y)
 	{
 		base.constructor(_x, _y);
 
-		hspeed = 0;
+		hspeed = 0.2;
 		vspeed = -1;
 	}
 
@@ -66,27 +66,32 @@ Ball <- class extends Actor
 				if(distance2(x, y, hx, hy) <= 4)
 				{
 					//Get nearest edge
-					local ax = x - i.x;
-					local ay = y - i.y;
+					local x2 = i.x + 8;
+					local y2 = i.y + 4;
+					local ax = x - x2;
+					local ay = y - y2;
 
-					if(ax != 0 && ay != 0){
+					if(ax != 0 && ay != 0)
+					{
 						local fn = (ay / ax) / 2;
 						if(abs(fn) >= 1) //If it's a horizontal edge
 						{
-							if(x > i.x) hspeed = abs(hspeed);
+							if(x > x2) hspeed = abs(hspeed);
 							else hspeed = -(abs(hspeed));
 						} else 
 						{
-							if(y > i.y) vspeed = abs(vspeed);
+							if(y > y2) vspeed = abs(vspeed);
 							else vspeed = -(abs(vspeed));
 						}
-					} else if(ax == 0)
+					}
+					else if(ax == 0)
 					{
-						if(y > i.y) vspeed = abs(vspeed);
+						if(y > y2) vspeed = abs(vspeed);
 						else vspeed = -(abs(vspeed));
-					} else if(ay == 0)
+					}
+					else if(ay == 0)
 					{
-						if(x > i.x) hspeed = abs(hspeed);
+						if(x > x2) hspeed = abs(hspeed);
 						else hspeed = -(abs(hspeed));
 					}
 
