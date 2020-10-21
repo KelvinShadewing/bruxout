@@ -70,7 +70,7 @@ Ball <- class extends Actor
 
 					if(distance2(x, y, hx, hy) <= 4)
 					{
-						while(distance2(x, y, hx, hy) == 0)
+						while(distance2(x, y, hx, hy) < 4)
 						{
 							x -= hspeed / 8;
 							y -= vspeed / 8;
@@ -97,7 +97,7 @@ Ball <- class extends Actor
 		//Out of bounds
 		if(y > 244)
 		{
-			vspeed = -10;
+			vspeed = -1.0;
 			local pad = findActor("Paddle");
 			if(pad != -1) x = actor[pad].x;
 			else x = 160;
