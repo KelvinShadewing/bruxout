@@ -1,6 +1,7 @@
 /*------------*\
 | BRICK BUSTER |
 \*------------*/
+setWindowTitle("Bruxout");
 
 //Import actor lib
 donut("src/actors.nut");
@@ -17,86 +18,78 @@ quit <- false;
 //Actors
 Ball <- class extends Actor
 {
-	hspeed = 0;
-	vspeed = 0;
+	hspeed = 0.0;
+	vspeed = -1.0;
 
 	constructor(_x, _y)
 	{
 		base.constructor(_x, _y);
-
-		hspeed = 0.2;
-		vspeed = -1;
+		x = x.tofloat();
+		y = y.tofloat();
+		hspeed = 0.0;
+		vspeed = -1.0;
 	}
 
 	function step()
 	{
 		//Motion
-		x += hspeed;
-		y += vspeed;
 		if(y <= 12) vspeed = abs(vspeed);
 		if(x <= 12) hspeed = abs(hspeed);
 		if(x >= 308) hspeed = -(abs(hspeed));
 
 		//Collision
-		foreach(i in actor)
+		for(local mi = 0; mi < 8; mi++)
 		{
-			if(typeof i == "Paddle")
+			x += hspeed / 8;
+			y += vspeed / 8;
+
+			foreach(i in actor)
 			{
-				if(x >= i.x - 18 && x <= i.x + 18 && y >= 230 && vspeed > 0)
+				if(typeof i == "Paddle")
 				{
-					vspeed = -(vspeed);
-					if(vspeed > -2) vspeed -= 0.1;
-					hspeed = (x - i.x) / 10;
+					if(x >= i.x - 18 && x <= i.x + 18 && y >= 230 && vspeed > 0)
+					{
+						vspeed = -(vspeed);
+						if(vspeed > -2) vspeed -= 0.1;
+						hspeed = (x - i.x) / 10.0;
+					}
 				}
-			}
 
-			if(typeof i == "Brick")
-			{
-				local hx = x;
-				local hy = y;
-
-				if(x < i.x) hx = i.x;
-				else if(x > i.x + 16) hx = i.x + 16;
-				else hx = x;
-
-				if(y < i.y) hy = i.y;
-				else if(y > i.y + 8) hy = i.y + 8;
-				else hy = y;
-
-				if(distance2(x, y, hx, hy) <= 4)
+				if(typeof i == "Brick")
 				{
-					//Get nearest edge
-					local x2 = i.x + 8;
-					local y2 = i.y + 4;
-					local ax = x - x2;
-					local ay = y - y2;
+					local hx = x;
+					local hy = y;
 
-					if(ax != 0 && ay != 0)
+					if(x < i.x) hx = i.x;
+					else if(x > i.x + 16) hx = i.x + 16;
+					else hx = x;
+
+					if(y < i.y) hy = i.y;
+					else if(y > i.y + 8) hy = i.y + 8;
+					else hy = y;
+
+					if(distance2(x, y, hx, hy) <= 4)
 					{
-						local fn = (ay / ax) / 2;
-						if(abs(fn) >= 1) //If it's a horizontal edge
+						while(distance2(x, y, hx, hy) == 0)
 						{
-							if(x > x2) hspeed = abs(hspeed);
-							else hspeed = -(abs(hspeed));
-						} else 
-						{
-							if(y > y2) vspeed = abs(vspeed);
-							else vspeed = -(abs(vspeed));
+							x -= hspeed / 8;
+							y -= vspeed / 8;
 						}
-					}
-					else if(ax == 0)
-					{
-						if(y > y2) vspeed = abs(vspeed);
-						else vspeed = -(abs(vspeed));
-					}
-					else if(ay == 0)
-					{
-						if(x > x2) hspeed = abs(hspeed);
-						else hspeed = -(abs(hspeed));
-					}
+						//Get nearest edge
+						local ax = x - hx;
+						local ay = y - hy;
 
-					//Delete other
-					deleteActor(i.id);
+						if(ax == 0) vspeed = -vspeed;
+						else if(ay == 0) hspeed = -hspeed;
+						else
+						{
+							vspeed = (ay < 0) ? -abs(vspeed) : abs(vspeed);
+							hspeed = (ax < 0) ? -abs(hspeed) : abs(hspeed);
+						}
+
+						//Delete other
+						deleteActor(i.id);
+					}
 				}
 			}
 		}
@@ -104,7 +97,7 @@ Ball <- class extends Actor
 		//Out of bounds
 		if(y > 244)
 		{
-			vspeed = -1;
+			vspeed = -10;
 			local pad = findActor("Paddle");
 			if(pad != -1) x = actor[pad].x;
 			else x = 160;
